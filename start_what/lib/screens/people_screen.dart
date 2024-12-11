@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:start_what/people_response/people_response.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class PeopleScreenWidget extends StatefulWidget {
   const PeopleScreenWidget({super.key});
@@ -10,12 +10,21 @@ class PeopleScreenWidget extends StatefulWidget {
 }
 
 class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
-  late Future<PeopleResponse> peopleResponse;
+  late Future<List<dynamic>> peopleResponse;
 
   @override
   void initState() {
-   super.initState();
-   peopleResponse = getPeople();
+    super.initState();
+    peopleResponse = getPeople();
+  }
+
+  Future<List<dynamic>> getPeople() async {
+    final response = await http.get(Uri.parse('https://swapi.dev/api/people/'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body)['results'];
+    } else {
+      throw Exception('Failed to load people');
+    }
   }
 
   @override
@@ -23,38 +32,58 @@ class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('People'),
+        backgroundColor: Colors.black,
       ),
-    body: FutureBuilder<PeopleResponse>(
-    future: peopleResponse,
-    builder: (context, snapshot) {
-      if (snapshot.hasData) {
-        return _buildPeopleList(snapshot.data!);
-      } else if (snapshot.hasError) {
-        return Text('${snapshot.error}');
-      }
-      return const CircularProgressIndicator();
-    },
-    ),
-  );
+      body: Container(
+        color: Colors.black,
+        child: FutureBuilder<List<dynamic>>(
+          future: peopleResponse,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return _buildPeopleGrid(snapshot.data!);
+            } else if (snapshot.hasError) {
+              return Center(child: Text('${snapshot.error}', style: const TextStyle(color: Colors.white)));
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
+      ),
+    );
   }
 
-  Future<PeopleResponse> getPeople() async {
-  final response = await http
-      .get(Uri.parse('https://swapi.dev/api/people'));
-
-  if (response.statusCode == 200) {
-    return PeopleResponse.fromJson((response.body));
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
-
-  Widget _buildPeopleList(PeopleResponse peopleResponse) {
-    return ListView.builder(
-      itemCount: peopleResponse.results!.length, 
+  Widget _buildPeopleGrid(List<dynamic> people) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        mainAxisExtent: 150,
+      ),
+      itemCount: people.length,
       itemBuilder: (context, index) {
-        return Text(peopleResponse.results![index].name!);
-      }
-    ); 
+        return Card(
+          color: Colors.white,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    people[index]['name'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
