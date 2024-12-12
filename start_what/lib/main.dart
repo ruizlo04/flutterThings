@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:start_what/people_response/result.dart';
 import 'package:start_what/screens/people_screen.dart';
 
 void main() {
@@ -12,15 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'STAR WHAT?',
       theme: ThemeData(
-       
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 0, 0)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const PeopleScreenWidget(),
+      home: const PeopleScreen(),
     );
   }
 }
-
-

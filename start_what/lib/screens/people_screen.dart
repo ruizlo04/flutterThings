@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:start_what/people_response/result.dart';
+import 'package:start_what/people_response/people_response.dart';
 
-class PeopleScreenWidget extends StatefulWidget {
-  const PeopleScreenWidget({super.key});
+class PeopleScreen extends StatefulWidget {
+  const PeopleScreen({super.key});
 
   @override
-  State<PeopleScreenWidget> createState() => _PeopleScreenWidgetState();
+  State<PeopleScreen> createState() => _PeopleScreenState();
 }
 
-class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
-  late Future<List<dynamic>> peopleResponse;
+class _PeopleScreenState extends State<PeopleScreen> {
+  late Future<PeopleResponse> peopleResponse;
 
   @override
   void initState() {
@@ -18,10 +20,10 @@ class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
     peopleResponse = getPeople();
   }
 
-  Future<List<dynamic>> getPeople() async {
+  Future<PeopleResponse> getPeople() async {
     final response = await http.get(Uri.parse('https://swapi.dev/api/people/'));
     if (response.statusCode == 200) {
-      return json.decode(response.body)['results'];
+      return PeopleResponse.fromJson(response.body);
     } else {
       throw Exception('Failed to load people');
     }
@@ -31,18 +33,36 @@ class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('People'),
-        backgroundColor: Colors.black,
+        flexibleSpace: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.network(
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeVRzYgIjsGmM8W9jaTaLraF8U0Whs6hvC3bHWHgiZOov6CaeciyJ1MMPHkwfJKU_fmbA&usqp=CAU',
+                fit: BoxFit.cover,
+              ),
+            ),
+            Container(
+              color: Colors.black.withOpacity(0.6),
+            ),
+          ],
+        ),
+        toolbarHeight: 200.0,
       ),
       body: Container(
         color: Colors.black,
-        child: FutureBuilder<List<dynamic>>(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<PeopleResponse>(
           future: peopleResponse,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return _buildPeopleGrid(snapshot.data!);
+              return _buildPeopleGrid(snapshot.data!.results!);
             } else if (snapshot.hasError) {
-              return Center(child: Text('${snapshot.error}', style: const TextStyle(color: Colors.white)));
+              return Center(
+                child: Text(
+                  '${snapshot.error}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              );
             }
             return const Center(child: CircularProgressIndicator());
           },
@@ -51,13 +71,13 @@ class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
     );
   }
 
-  Widget _buildPeopleGrid(List<dynamic> people) {
+  Widget _buildPeopleGrid(List<People> people) {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        mainAxisExtent: 150,
+        crossAxisCount: 2,
+        crossAxisSpacing: 20.0,
+        mainAxisSpacing: 20.0,
+        mainAxisExtent: 200,
       ),
       itemCount: people.length,
       itemBuilder: (context, index) {
@@ -70,7 +90,7 @@ class _PeopleScreenWidgetState extends State<PeopleScreenWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    people[index]['name'],
+                    people[index].name ?? '',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
