@@ -98,4 +98,7 @@ class People {
   ///
   /// Converts [People] to a JSON string.
   String toJson() => json.encode(toMap());
+
+  String get id => url?.split('/').where((part) => part.isNotEmpty).last ?? '';
+
 }
