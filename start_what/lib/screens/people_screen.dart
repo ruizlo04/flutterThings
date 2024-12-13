@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:start_what/people_response/result.dart';
 import 'package:start_what/people_response/people_response.dart';
+import 'people_detail_screen.dart';
 
 class PeopleScreen extends StatefulWidget {
   const PeopleScreen({super.key});
@@ -82,7 +83,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisExtent: 200,
+        mainAxisExtent: 260,
         crossAxisSpacing: 10.0,
         mainAxisSpacing: 10.0,
       ),
@@ -91,41 +92,75 @@ class _PeopleScreenState extends State<PeopleScreen> {
         final person = people[index];
         final imageUrl = 'https://starwars-visualguide.com/assets/img/characters/${person.id}.jpg'; 
 
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0)
-          ),
-          child: Card(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    color: Colors.black.withOpacity(0.5),
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      person.name ?? '',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PeopleDetailScreen(peopleItem: person),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Card(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Hero(
+                      tag: 'hero-${person.name}',
+                      child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey,
+                          child: const Icon(
+                            Icons.error,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
+                    ),
+                    )
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.5),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            person.name ?? '',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            'Height: ${person.height ?? 'Unknown'}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
