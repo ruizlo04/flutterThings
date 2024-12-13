@@ -20,6 +20,8 @@ class _PeopleDetailScreenState extends State<PeopleDetailScreen> {
       ),
       body: Container(
         color: Colors.black,
+        width: double.infinity,
+        height: double.infinity,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -32,7 +34,7 @@ class _PeopleDetailScreenState extends State<PeopleDetailScreen> {
                     'https://starwars-visualguide.com/assets/img/characters/${widget.peopleItem.id}.jpg',
                     width: 200,
                     height: 200,
-                ),
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 Center(
@@ -51,13 +53,24 @@ class _PeopleDetailScreenState extends State<PeopleDetailScreen> {
                   thickness: 1.0,
                   color: Colors.white,
                 ),
-                DetailBox(title: 'Tamaño', value: widget.peopleItem.height),
-                DetailBox(title: 'Masa', value: widget.peopleItem.mass),
-                DetailBox(title: 'Color Pelo', value: widget.peopleItem.hairColor),
-                DetailBox(title: 'Color Piel', value: widget.peopleItem.skinColor),
-                DetailBox(title: 'Color Ojos', value: widget.peopleItem.eyeColor),
-                DetailBox(title: 'Año nacimiento', value: widget.peopleItem.birthYear),
-                DetailBox(title: 'Género', value: widget.peopleItem.gender),
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DetailRow(icon: Icons.height, title: 'Tamaño', value: widget.peopleItem.height),
+                      DetailRow(icon: Icons.fitness_center, title: 'Masa', value: widget.peopleItem.mass),
+                      DetailRow(icon: Icons.palette, title: 'Color Piel', value: widget.peopleItem.skinColor),
+                      DetailRow(icon: Icons.remove_red_eye, title: 'Color Ojos', value: widget.peopleItem.eyeColor),
+                      DetailRow(icon: Icons.cake, title: 'Año nacimiento', value: widget.peopleItem.birthYear),
+                      DetailRow(icon: Icons.person, title: 'Género', value: widget.peopleItem.gender),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -67,30 +80,34 @@ class _PeopleDetailScreenState extends State<PeopleDetailScreen> {
   }
 }
 
-class DetailBox extends StatelessWidget {
+class DetailRow extends StatelessWidget {
+  final IconData icon;
   final String title;
   final String? value;
 
-  const DetailBox({super.key, required this.title, this.value});
+  const DetailRow({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.yellow,
-        borderRadius: BorderRadius.circular(8.0),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          Icon(icon, color: Colors.black),
+          const SizedBox(width: 8.0),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
           Text(
